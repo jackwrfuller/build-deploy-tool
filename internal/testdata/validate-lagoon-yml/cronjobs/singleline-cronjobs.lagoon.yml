@@ -27,6 +27,7 @@ environments:
       - name: block scalar literal stripped
         command: |-
           singleline command
+
       - name: block scalar folded clipped 1
         command: >
           singleline
