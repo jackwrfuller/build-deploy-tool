@@ -42,6 +42,4 @@ environments:
         command: >-
           singleline command
 
-
-
 # dummy comment to keep previous newline
