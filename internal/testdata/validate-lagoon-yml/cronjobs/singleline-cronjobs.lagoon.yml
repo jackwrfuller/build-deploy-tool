@@ -35,5 +35,14 @@ environments:
       - name: block scalar folded stripped 2
         command: >-
           singleline command
+      - name: block scalar folded clipped 1
+        command: >
+          singleline
+          command
+      - name: block scalar folded clipped 2
+        command: >
+          singleline command
+
+
 
 # dummy comment to keep previous newline
