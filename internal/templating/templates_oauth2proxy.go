@@ -20,8 +20,10 @@ import (
 func GenerateOauth2ProxyTemplate(routes *[]lagoon.RouteV2, bValues generator.BuildValues) (*metav1.List, error) {
 	o2pServiceName := bValues.Namespace + "-oauth2proxy"
 	o2pServicePort := int32(4180)
-	keycloakURL := os.Getenv("LAGOON_FEATURE_FLAG_DEFAULT_KEYCLOAK_FRONTEND_URL") + "/auth/realms/lagoon"
-	apiURL := os.Getenv("LAGOON_CONFIG_API_HOST") + "/graphql"
+	keycloakURL    := os.Getenv("LAGOON_FEATURE_FLAG_DEFAULT_KEYCLOAK_FRONTEND_URL") + "/auth/realms/lagoon"
+	clientSecret   := os.Getenv("LAGOON_FEATURE_FLAG_DEFAULT_KEYCLOAK_OAUTH2PROXY_CLIENT_SECRET")
+	cookieSecret   := os.Getenv("LAGOON_FEATURE_FLAG_DEFAULT_KEYCLOAK_OAUTH2PROXY_COOKIE_SECRET")
+	apiURL         := os.Getenv("LAGOON_CONFIG_API_HOST") + "/graphql"
 
 	var o2pHosts []string
 	var cookieDomains []string
@@ -30,8 +32,6 @@ func GenerateOauth2ProxyTemplate(routes *[]lagoon.RouteV2, bValues generator.Bui
 		cookieDomains = append(cookieDomains, (*routes)[i].Domain)
 		(*routes)[i].Oauth2ProxyDomain = "o2p." + (*routes)[i].Domain
 	}
-
-
 
 	ingressLabels := map[string]string{
 		"app.kubernetes.io/name":       "oauth2proxy",
@@ -195,26 +195,8 @@ func GenerateOauth2ProxyTemplate(routes *[]lagoon.RouteV2, bValues generator.Bui
 								{Name: "OAUTH2_PROXY_LAGOON_ENDPOINT", Value: apiURL },
 								{Name: "OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION", Value: "true"},
 								{Name: "OAUTH2_PROXY_INSECURE_OIDC_ALLOW_UNVERIFIED_EMAIL", Value: "true"},
-								//{
-								//	Name: "OAUTH2_PROXY_CLIENT_SECRET",
-								//	ValueFrom: &corev1.EnvVarSource{
-								//		SecretKeyRef: &corev1.SecretKeySelector{
-								//			LocalObjectReference: corev1.LocalObjectReference{Name: "lagoon-core-keycloak"},
-								//			Key:                  "KEYCLOAK_LAGOON_O2P_CLIENT_SECRET",
-								//		},
-								//	},
-								//},
-								//{
-								//	Name: "OAUTH2_PROXY_COOKIE_SECRET",
-								//	ValueFrom: &corev1.EnvVarSource{
-								//		SecretKeyRef: &corev1.SecretKeySelector{
-								//			LocalObjectReference: corev1.LocalObjectReference{Name: "lagoon-core-oauth2proxy"},
-								//			Key:                  "OAUTH2_PROXY_COOKIE_SECRET",
-								//		},
-								//	},
-								//},
-								{Name: "OAUTH2_PROXY_CLIENT_SECRET", Value: "2c88d6cc-ba02-410b-b244-39a186011fb4"},
-								{Name: "OAUTH2_PROXY_COOKIE_SECRET", Value: "ozKSRCpcWddKBnfjayfYuBMEvPlpgoEI"},
+								{Name: "OAUTH2_PROXY_CLIENT_SECRET", Value: clientSecret},
+								{Name: "OAUTH2_PROXY_COOKIE_SECRET", Value: cookieSecret},
 								{Name: "OAUTH2_PROXY_PROVIDER", Value: "oidc"},
 								{Name: "OAUTH2_PROXY_CLIENT_ID", Value: "lagoon-oauth2proxy"},
 								{Name: "OAUTH2_PROXY_HTTP_ADDRESS", Value: "0.0.0.0:4180"},
